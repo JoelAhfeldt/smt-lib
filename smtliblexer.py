@@ -22,8 +22,7 @@ class Lexer:
                         "echo", "exit", "get-assertions" "get-assignment", "get-info", "get-model", "get-option",
                         "get-proof", "get-unsat-assumptions", "get-unsat-core", "get-value","pop", "push", "reset",
                         "reset-assertions", "set-info", "set-logic", "set-option"]
-    simplesymb = r"[a-zA-Z~!@$%^&*_+=<>.?/-][0-9a-zA-Z~!@$%^&*_+=<>.?/-]*"
-    #simplesymb = r"[\+\w\-/\*=%?!$_˜&ˆ<>@]+[\w\d\+\-/\*=%\?\!$_˜&ˆ<>@]*"
+    simplesymb = r"[a-zA-Z~!@$%^&*_+=<>.?/-][0-9a-zA-Z~!@$%^&*_+=<>.?/-]*"<,
     tokentype = {"<decimal>": r"(([1-9][0-9]*)\.([0-9]+))",
                  "<numeral>": r"0|([1-9][0-9]*)",
                  "<hexadecimal>": r"#x[0-9a-fA-F]+",
