@@ -18,36 +18,53 @@ class Translator:
         assert_key = "_".join(assert_lvl)
         if assert_key in self.assert_names:
             self.assert_names[assert_key] += 1
-            return "assertion_" + assert_key + "_" + str(self.assert_names[assert_key])
+            if assert_key == "":
+                return "assertion_"+ str(self.assert_names[assert_key])
+            else:
+                return "assertion_" + assert_key + "_" + str(self.assert_names[assert_key])
         else:
             self.assert_names[assert_key] = 1
-            return "assertion_" + assert_key + "_" + "1"
+            if assert_key == "":
+                return "assertion_1"
+            else:
+                return "assertion_" + assert_key + "_" + "1"
 
     # get all assertions on the current lvl
     def get_assertions(self, assert_lvl):
         assertions = []
         length = len(assert_lvl)
-        for i in range(length):
-            assert_key = "_".join(assert_lvl[0:i+1])
+        for i in range(length+1):
+            assert_key = "_".join(assert_lvl[0:i])
             if assert_key in self.assert_names:
                 assert_nr = self.assert_names[assert_key]
                 for j in range(1, assert_nr+1):
-                    assertions.append("assertion_" + assert_key + "_" + str(j))
+                    if assert_key == "":
+                        assertions.append("assertion_"+str(j))
+                    else:
+                        assertions.append("assertion_" + assert_key + "_" + str(j))
         return assertions
 
     """
       Translating functions:
       ______________________
     """
-    def translate_const(self, cmd):
-        if len(cmd.children) == 3:
-            return [self.translate_type(cmd.children[2]), cmd.children[1]]
-
     def translate_fun(self, cmd):
+        # translate type of all variables
+        trans_type = [self.translate_type(t.children[1].data) for t in cmd.children[2].children]
+        var = [t.children[0].data for t in cmd.children[2].children]
+        # translate fun definition
+        fun_def = self.translate_tree(cmd.children[4])
+        return [self.translate_type(cmd.children[3].data), cmd.children[1].data, trans_type, var, fun_def]
+
+    def translate_const(self, cmd):
         if len(cmd.children) == 4:
-            # translate the typing of the functions variables
-            trans_type = [self.translate_type(t) for t in cmd.children[2].children]
-            return [self.translate_type(cmd.children[3]), cmd.children[1], trans_type]
+            # check that its a constant function
+            if len(cmd.children[2].children) == 0:
+                return [self.translate_type(cmd.children[3].data), cmd.children[1].data]
+        if len(cmd.children) == 3:
+            return [self.translate_type(cmd.children[2].data), cmd.children[1].data]
+
+
 
     def translate_type(self, type):
         if type in ["int", "bool"]:
@@ -208,24 +225,17 @@ class Translator:
             cmd = pop_next_command(commands)
 
             if is_assert(cmd):
+                # Get and register new assert_name
 
-                if initial_call:
-                    translation = self.translate_assert(cmd)
-                    # add translation as a constraint
-                    hll_model.constraints.append(translation)
+                assert_name = self.get_new_assert_name(assert_lvl)
 
-                else:
-                    # Get and register new assert_name
+                translation = self.translate_assert(cmd, assert_name)
 
-                    assert_name = self.get_new_assert_name(assert_lvl)
+                hll_model.assertions.append(translation)
 
-                    translation = self.translate_assert(cmd, assert_name)
+                # Add the assert to 'hll_model' as a definition
 
-                    hll_model.assertions.append(translation)
-
-                    # Add the assert to 'hll_model' as a definition
-
-                    # (of the variable named by 'assert_name')...
+                # (of the variable named by 'assert_name')...
 
             elif is_check_sat(cmd):
 
@@ -243,11 +253,20 @@ class Translator:
                     # Continue with other commands
 
             elif is_declare_fun(cmd):
-                translation = self.translate_fun(cmd)
-                return
-            elif is_declare_const(cmd):
-                translation = self.translate_fun(cmd)
+                translation = self.translate_const(cmd)
                 hll_model.constants.append(translation)
+                return
+
+            elif is_define_fun(cmd):
+                translation = self.translate_fun(cmd)
+                hll_model.funs.append(translation)
+
+            elif is_declare_const(cmd):
+                translation = self.translate_const(cmd)
+                hll_model.constants.append(translation)
+
+
+
             elif is_exit(cmd):
                 return
 
@@ -300,28 +319,28 @@ def parse():
 #'''
 
 def is_define_sort(cmd):
-    if cmd.children[0].data == "define_sort":
+    if cmd.children[0].data == "define-sort":
         return True
     else:
         return False
 
 
 def is_define_funs_rec(cmd):
-    if cmd.children[0].data == "define_funs_rec":
+    if cmd.children[0].data == "define-funs-rec":
         return True
     else:
         return False
 
 
 def is_define_fun_rec(cmd):
-    if cmd.children[0].data == "define_fun_rec":
+    if cmd.children[0].data == "define-fun-rec":
         return True
     else:
         return False
 
 
 def is_define_fun(cmd):
-    if cmd.children[0].data == "define_fun":
+    if cmd.children[0].data == "define-fun":
         return True
     else:
         return False
