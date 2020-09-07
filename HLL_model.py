@@ -1,4 +1,4 @@
-class hll_model:
+lass hll_model:
     constants = []
     funs = []
     assertions = []
@@ -8,23 +8,28 @@ class hll_model:
     def __init__(self):
         self.assertions = []
 
+    def write_inputs(self, file):
+        file.write("inputs:\n")
+        for constant in self.constants:
+            file.write(constant[0] + " " + constant[1]+"\n")
+
     def write_constants(self, file):
         file.write("constants:\n")
-        for constant in self.constants:
-            file.write(constant[1]+" "+constant[0]+"\n")
 
     def write_declarations(self, file):
         file.write("declarations:\n")
         for assertion in self.assertions:
             file.write("bool "+assertion[0]+"\n")
-        for constant in self.constants:
-            file.write(constant[0]+" "+constant[1])
+        for fun in self.funs:
+            file.write(fun[0]+" "+fun[1]+"("+", ".join(fun[2])+")\n")
 
 
     def write_definitions(self, file):
         file.write("declarations:\n")
         for assertion in self.assertions:
             file.write(assertion[0]+" := " + assertion[1].print_HLL()+"\n")
+        for fun in self.funs:
+            file.write(fun[1]+"("+", ".join(fun[3])+") = "+fun[4].print_HLL()+"\n")
 
     def write_constraints(self, file):
         file.write("declarations:\n")
@@ -37,7 +42,7 @@ class hll_model:
 
 
     def write_hll(self, file):
-        self.write_constants(file)
+        self.write_inputs(file)
         self.write_declarations(file)
         self.write_definitions(file)
         self.write_constants(file)
@@ -72,3 +77,4 @@ class HLL_ast:
             return "("+text+")"
         elif self.node_type == "var":
             return self.value
+
