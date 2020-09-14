@@ -1,0 +1,12 @@
+inputs:
+Int c_main_t~ret12
+Bool c_main_t~short13
+Int c_main_~n~22
+Int v_nnf_16
+declarations:
+bool assertion_1
+declarations:
+assertion_1 := (SOME a:[0, 100](a=v_nnf_16) & SOME b:[0, 100] c:[0, 100](c<b))
+constants:
+proof obligations:
+(~(assertion_1))

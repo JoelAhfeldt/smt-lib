@@ -1,0 +1,13 @@
+inputs:
+Int |c_main_#t~ret12|
+Int c_main_~n~22
+Int c_main_~f1~22
+declarations:
+bool assertion_1
+bool assertion_2
+declarations:
+assertion_1 := SOME v_nnf_94:[0, 100] v_nnf_95:[0, 100] v_nnf_96:[0, 100](((c_main_~f1~22+(2*v_nnf_94)+(2*v_nnf_95)+(2*v_nnf_96)+1)<=|c_main_#t~ret12|) & (c_main_~f1~22<=v_nnf_94) & (v_nnf_96<=v_nnf_95) & (v_nnf_94<=v_nnf_96) & (c_main_~n~22<=2))
+assertion_2 := (~(SOME v_nnf_94:[0, 100] v_nnf_95:[0, 100] v_nnf_96:[0, 100](((c_main_~f1~22+(2*v_nnf_94)+(2*v_nnf_95)+(2*v_nnf_96)+1)<=|c_main_#t~ret12|) & (c_main_~f1~22<=v_nnf_94) & (v_nnf_96<=v_nnf_95) & (v_nnf_94<=v_nnf_96) & (c_main_~n~22<=2)) & (c_main_~n~22<=2)))
+constants:
+proof obligations:
+(~(assertion_1 & assertion_2))
